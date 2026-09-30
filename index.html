@@ -293,7 +293,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items));localStorage
 // 今日行く店（12時間だけ覚えておく）。autoName は現在地から選んだ店、manualAt は手で選んだ時刻
 const SKEY='shopping-memo-store-v1';
 let todayStore='',autoName='',manualAt=0,RECS=[],addStore='',addCat='';
-try{const o=JSON.parse(localStorage.getItem(SKEY)||'null');if(o&&o.name&&Date.now()-o.ts<12*3600e3)todayStore=o.name}catch(e){}
+try{const o=JSON.parse(localStorage.getItem(SKEY)||'null');if(o&&o.name&&Date.now()-o.ts<12*3600e3){todayStore=o.name;if(o.auto)autoName=o.name}}catch(e){}
 // 定番セットと、うちにある物（期限つき）
 const SETKEY='shopping-memo-sets-v1',STKEY='shopping-memo-stock-v1';
 let sets=[],stock=[];
@@ -621,7 +621,7 @@ function renderStores(){
 }
 function setStore(name,auto){
   todayStore=name;autoName=auto?name:'';if(!auto)manualAt=Date.now();
-  try{if(name)localStorage.setItem(SKEY,JSON.stringify({name,ts:Date.now()}));else localStorage.removeItem(SKEY)}catch(e){}
+  try{if(name)localStorage.setItem(SKEY,JSON.stringify({name,ts:Date.now(),auto:!!auto}));else localStorage.removeItem(SKEY)}catch(e){}
   render();
 }
 // 近くの店を自動で選ぶ（位置は端末の中だけ。店の座標は最安くらべが記録したもの）
@@ -653,7 +653,12 @@ async function autoLocate(force){
   if(!p||p.acc>300)return;
   let best=null;
   for(const s of locs){const d=dist(p,s);if(d<=150&&(!best||d<best.d))best={store:s.store,d}}
-  if(!best)return;
+  if(!best){
+    // 選んでいる店から500mより離れたら、選びを外す（店の座標が無ければ判断できないので、そのまま）
+    const sel=todayStore&&locs.find(s=>sameStore(s.store,todayStore));
+    if(sel&&dist(p,sel)>500){setStore('',true);toast('店から離れたので「すべて」に戻したのだ')}
+    return;
+  }
   const changed=!sameStore(todayStore,best.store);
   setStore(best.store,true);
   if(changed)toast('📍 '+best.store+' にいます');

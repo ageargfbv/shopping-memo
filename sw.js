@@ -1,4 +1,4 @@
-const CACHE = 'shopping-memo-v19';
+const CACHE = 'shopping-memo-v20';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './dela.woff2', './zun-normal.png', './zun-surprise.png', './zun-smile.png'];
 
 self.addEventListener('install', e => {
