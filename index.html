@@ -980,7 +980,7 @@ const bkHash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)
 const bkApi=(method,path,body)=>fetch('https://api.github.com/repos/'+BK.owner+'/'+BK.repo+path,{method,
   headers:{'Authorization':'Bearer '+bkTok(),'Accept':'application/vnd.github+json','Content-Type':'application/json'},
   body:body?JSON.stringify(body):undefined});
-const bkErr=e=>{const s=e&&e.status;return s===401||s===403?'トークンを確認してください（'+s+'）':s===404?'保管庫が見つかりません（404）':s?'保存できませんでした（'+s+'）':'通信できませんでした'};
+const bkErr=e=>{const s=e&&e.status;return s===401||s===403?'トークンを確認してください（'+s+'）':s===404?'トークンの対象に backup-data が入っていません（404）':s?'保存できませんでした（'+s+'）':'通信できませんでした'};
 async function bkRemote(){
   const r=await bkApi('GET','/contents/'+BK.file+'?t='+Date.now());
   if(r.status===404)return null;
