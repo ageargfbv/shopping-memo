@@ -1,4 +1,4 @@
-const CACHE = 'shopping-memo-v15';
+const CACHE = 'shopping-memo-v16';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './dela.woff2', './zun-normal.png', './zun-surprise.png', './zun-smile.png'];
 
 self.addEventListener('install', e => {
@@ -12,28 +12,25 @@ self.addEventListener('activate', e => {
   );
 });
 
-// HTML はネット優先（更新がすぐ反映される）。画像・書体・アイコンはキャッシュ優先（移動のたびに何度も問い合わせない。変えるときはキャッシュ名を上げる）
+// 開くときはまず端末に置いた版をすぐ出し、裏でサーバーの新しい版を取って置き換える（次に開いたときに新しくなる）。
+// ネットの往復を待たないので、アプリ間の移動が速い。画像・書体・アイコンもキャッシュ優先（変えるときはキャッシュ名を上げる）
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET') return;
   const u = new URL(r.url);
   if (u.origin !== location.origin) return;
   const isPage = r.mode === 'navigate' || /(^|\/)(index\.html)?$/.test(u.pathname) || u.pathname.endsWith('.webmanifest');
-  if (isPage) {
-    e.respondWith(
-      fetch(r, { cache: 'no-cache' }).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(r, copy));
-        return res;
-      }).catch(() => caches.match(r).then(x => x || caches.match('./index.html')))
-    );
-  } else {
-    e.respondWith(
-      caches.match(r).then(x => x || fetch(r).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(r, copy));
-        return res;
-      }))
-    );
-  }
+  e.respondWith((async () => {
+    const c = await caches.open(CACHE);
+    const cached = await c.match(r, { ignoreSearch: true });
+    if (!isPage) {
+      if (cached) return cached;
+      const res = await fetch(r);
+      c.put(r, res.clone());
+      return res;
+    }
+    const net = fetch(r, { cache: 'no-cache' }).then(res => { if (res.ok) c.put(r, res.clone()); return res; }).catch(() => null);
+    e.waitUntil(net);
+    return cached || (await net) || (await c.match('./index.html'));
+  })());
 });
