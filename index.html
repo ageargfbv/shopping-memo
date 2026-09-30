@@ -7,34 +7,46 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<meta name="theme-color" content="#2f855a">
+<meta name="theme-color" content="#55b834">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="買い物メモ">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+1p:wght@400;500;700;800&display=swap">
 <style>
-:root{--bg:#f3f6f3;--card:#fff;--card2:#f1f4f1;--fg:#1a1d1b;--sub:#6b726d;--acc:#2f855a;--acc2:#3aa46f;--soft:#e4f3ea;--line:#e4e8e4;--danger:#e5484d;--shadow:0 6px 20px rgba(20,60,40,.10);--tab:66px}
-@media (prefers-color-scheme:dark){:root{--bg:#101210;--card:#1b1e1b;--card2:#252925;--fg:#eef0ed;--sub:#9aa19c;--acc:#48bb78;--acc2:#38a169;--soft:#1f3a2b;--line:#2b302b;--shadow:0 6px 20px rgba(0,0,0,.4)}}
+:root{--bg:#f2f9e6;--card:#fff;--card2:#eef6df;--fg:#1d2b12;--sub:#6a7a58;--acc:#4aa52e;--acc2:#8bd44a;--gd:#2f7d1e;--soft:#e2f5bd;--line:#dfeccb;--danger:#e5484d;--shadow:0 5px 0 var(--line),0 8px 18px rgba(50,90,20,.14);--tab:66px}
+@media (prefers-color-scheme:dark){:root{--bg:#11190d;--card:#1b2615;--card2:#243020;--fg:#eef5e6;--sub:#a3b394;--acc:#6cc24a;--acc2:#4aa52e;--gd:#9be36f;--soft:#26401b;--line:#2c3a24;--shadow:0 5px 0 #0a1007,0 8px 18px rgba(0,0,0,.4)}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 24px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 "M PLUS 1p",system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 24px);-webkit-text-size-adjust:100%}
 button{font:inherit;border:0;background:none;color:inherit;padding:0;cursor:pointer}
 input{font:inherit;color:var(--fg)}
 
-/* 上のバナー */
-.hero{background:linear-gradient(135deg,var(--acc) 0%,var(--acc2) 100%);color:#fff;padding:calc(env(safe-area-inset-top) + 18px) 16px 46px;border-radius:0 0 28px 28px}
-.hero-in{max-width:560px;margin:0 auto}
-.top{display:flex;justify-content:space-between;align-items:flex-start}
-.date{font-size:13px;opacity:.85;letter-spacing:.02em}
-h1{margin:2px 0 0;font-size:28px;line-height:1.2;letter-spacing:.01em}
-.ico{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);font-size:18px;display:grid;place-items:center;color:#fff}
-.ico:active{background:rgba(255,255,255,.35)}
-.prog{margin-top:16px}
-.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.28);overflow:hidden}
-.bar i{display:block;height:100%;width:0;border-radius:99px;background:#fff;transition:width .45s cubic-bezier(.2,.8,.2,1)}
-.ptxt{display:flex;justify-content:space-between;font-size:13px;margin-top:6px;opacity:.95}
+/* 上の帯（細く・全画面で同じ高さ） */
+.hd{background:linear-gradient(135deg,#55b834,#8bd44a);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 14px;border-radius:0 0 20px 20px;box-shadow:0 4px 0 rgba(47,125,30,.35)}
+.hd-in{max-width:560px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;font:400 21px/1 "Dela Gothic One","M PLUS 1p",sans-serif;text-shadow:0 2px 0 rgba(30,80,10,.35)}
+.logo i{width:34px;height:34px;border-radius:10px;background:#fff;display:grid;place-items:center;font-style:normal;font-size:19px;text-shadow:none}
+.ico{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.28);font-size:15px;display:grid;place-items:center;color:#fff}
+.ico:active{background:rgba(255,255,255,.45)}
+.pg{margin-top:10px;height:6px;border-radius:99px;background:rgba(255,255,255,.4);overflow:hidden}
+.pg i{display:block;height:100%;width:0;border-radius:99px;background:#fff;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+main{max-width:560px;margin:0 auto;padding:12px 16px 0}
 
-main{max-width:560px;margin:-28px auto 0;padding:0 16px}
+/* ずんだもんの吹き出し */
+.bub{display:flex;gap:12px;align-items:center;margin:4px 0 12px;width:100%;text-align:left;padding:0}
+.av{flex:none;width:64px;height:64px;border-radius:50%;background:#e2f5bd url(zun-normal.png) 0 0/105% auto no-repeat;border:3px solid #fff;box-shadow:0 3px 0 rgba(30,80,10,.22),0 0 0 3px #c4ec6f}
+.av.w{background-image:url(zun-surprise.png)}
+.say{position:relative;background:var(--card);color:var(--fg);border-radius:18px;padding:9px 13px;font-weight:800;font-size:14px;line-height:1.4;box-shadow:0 3px 0 var(--line)}
+.say:before{content:"";position:absolute;left:-8px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:var(--card);border-left:0}
+.say b{color:var(--gd)}
+.fin{text-align:center;padding:8px 0 4px}
+.fin img{height:215px;display:block;margin:0 auto;filter:drop-shadow(0 6px 0 rgba(60,110,30,.22))}
+.fin .say2{display:inline-block;margin-top:10px;background:var(--card);border-radius:20px;padding:10px 16px;font:400 20px/1.35 "Dela Gothic One","M PLUS 1p",sans-serif;box-shadow:0 4px 0 var(--line)}
+.fin p{font-weight:800;color:var(--sub);font-size:13px;margin:8px 0 0}
+.credit{text-align:center;color:var(--sub);font-size:11px;margin:28px 0 8px}
 
 /* 追加バー */
 .add{display:flex;gap:8px;background:var(--card);border-radius:18px;padding:6px 6px 6px 16px;box-shadow:var(--shadow);align-items:center}
@@ -72,7 +84,7 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 .front{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .2s;touch-action:pan-y}
 .chk{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:transparent;font-size:16px;font-weight:800;transition:background .18s,border-color .18s,transform .18s}
 .chk:active{transform:scale(.88)}
-.row .chk{border-color:#b9c2bb}
+.row .chk{border-color:#b9cfa0}
 .row.done .chk{background:var(--acc);border-color:var(--acc);color:#fff}
 .row.pop .chk{transform:scale(1.18)}
 .row.pop .front{opacity:.35}
@@ -163,34 +175,36 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 </style>
 </head>
 <body>
-<header class="hero">
-  <div class="hero-in">
+<header class="hd">
+  <div class="hd-in">
     <div class="top">
-      <div><div class="date" id="date"></div><h1>買い物メモ</h1></div>
+      <div class="logo"><i>🛒</i>ずんだメモ</div>
       <div class="tools">
         <button class="ico" id="bSets" aria-label="セット">📋</button>
         <button class="ico" id="bStock" aria-label="うちにある物">🧊</button>
         <button class="ico" id="share" aria-label="リストを共有">⤴</button>
       </div>
     </div>
-    <div class="prog"><div class="bar"><i id="bar"></i></div><div class="ptxt"><span id="ptxt"></span><span id="pnum"></span></div></div>
+    <div class="pg"><i id="bar"></i></div>
   </div>
 </header>
 <main>
+  <button class="bub" id="bub" type="button"><div class="av" id="av"></div><div class="say" id="say"></div></button>
+  <div class="fin" id="fin" hidden><img src="zun-smile.png" alt=""><div class="say2">ぜんぶ買えたのだ！<br>えらいのだ！</div><p id="finTxt"></p></div>
   <form id="f" class="add" autocomplete="off">
-    <input id="t" placeholder="買うものを追加" enterkeyhint="done" autocapitalize="none" autocomplete="off" aria-label="買うもの">
+    <input id="t" placeholder="買うものを足すのだ" enterkeyhint="done" autocapitalize="none" autocomplete="off" aria-label="買うもの">
     <button type="button" class="stbtn" id="addSt" aria-label="買う店を選ぶ">🏪 おまかせ</button>
     <button aria-label="追加">＋</button>
   </form>
   <div class="pick" id="addStRow" hidden></div>
-  <button class="warn" id="warn" hidden></button>
   <div class="sug" id="tstore"></div>
   <div class="sug" id="sug"></div>
   <div id="list"></div>
   <section id="doneSec" hidden>
-    <div class="dh" id="dh"><button class="tg" id="dtg"><span>▾</span><b id="dcnt"></b></button><button class="clr" id="clr">済みを消す</button></div>
+    <div class="dh" id="dh"><button class="tg" id="dtg"><span>▾</span><b id="dcnt"></b></button><button class="clr" id="clr">済みを消すのだ</button></div>
     <div class="cardlist dim" id="done"></div>
   </section>
+  <p class="credit">立ち絵：坂本アヒルさん</p>
 </main>
 <nav class="tabs">
   <a class="cur" href="https://ageargfbv.github.io/shopping-memo/"><span class="i">📝</span>買い物メモ</a>
@@ -293,7 +307,7 @@ const fmt=x=>(Math.round(x.up*10)/10).toLocaleString('ja-JP')+'円/'+PC_UNIT[x.u
 function priceHint(text,recs){
   const i=priceInfo(text,recs);if(!i)return null;
   const days=Math.floor((Date.now()-i.best.ts)/DAY);
-  return {text:'最安 '+i.best.store+' '+fmt(i.best),old:days>30?days+'日前':''};
+  return {text:i.best.store+'が最安なのだ '+fmt(i.best),old:days>30?days+'日前':''};
 }
 
 // ---- 店 ----
@@ -315,18 +329,18 @@ function place(it,info,S){
   if(own){
     if(!sameStore(own,S))return {b:'other'};
     if(!best)return {b:'here'};
-    if(!mine)return {b:'here',note:best.store+'が最安 '+fmt(best)+'（ここは未確認）',cls:'w'};
-    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安 '+fmt(mine)};
-    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安 '+fmt(mine)};
-    return {b:'here',note:best.store+'の方が安い（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
+    if(!mine)return {b:'here',note:best.store+'が最安なのだ '+fmt(best)+'（ここは未確認）',cls:'w'};
+    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安なのだ '+fmt(mine)};
+    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安なのだ '+fmt(mine)};
+    return {b:'here',note:best.store+'の方が安いのだ（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
   }
   if(!info)return {b:'any'};
   if(mine){
-    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安 '+fmt(mine)};
-    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安 '+fmt(mine)};
-    return {b:'other',note:best.store+'が安い（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
+    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安なのだ '+fmt(mine)};
+    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安なのだ '+fmt(mine)};
+    return {b:'other',note:best.store+'が安いのだ（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
   }
-  return {b:'any',note:best.store+'が最安 '+fmt(best)+'（ここは未確認）',cls:'w'};
+  return {b:'any',note:best.store+'が最安なのだ '+fmt(best)+'（ここは未確認）',cls:'w'};
 }
 
 // ---- 通知と取り消し ----
@@ -353,8 +367,8 @@ function putItem(text,qty,store,cat){
   if(same){
     if(store)same.store=store;
     if(cat)same.cat=cat;
-    if(same.done){same.done=false;same.doneTs=0;same.qty=qty;msg='「'+short(text)+'」をリストに戻しました'}
-    else{same.qty=Math.min(99,same.qty+qty);msg='「'+short(text)+'」は入っていたので ×'+same.qty+' にしました'}
+    if(same.done){same.done=false;same.doneTs=0;same.qty=qty;msg='「'+short(text)+'」をリストに戻したのだ'}
+    else{same.qty=Math.min(99,same.qty+qty);msg='「'+short(text)+'」は入っていたので ×'+same.qty+' にしたのだ'}
   }else{
     items.push({id:uid(),text,done:false,qty,memo:'',store:store||'',cat:cat||guess(text),ts:Date.now(),doneTs:0});
   }
@@ -377,7 +391,7 @@ function addText(raw){
 function addSet(s){
   let n=0;
   for(const x of s.items){putItem(x.text,x.qty||1,effStore());n++}
-  save();closeSheet();toast('セット「'+short(s.name)+'」の '+n+' 点を追加しました');
+  save();closeSheet();toast('セット「'+short(s.name)+'」の '+n+' 点を追加したのだ');
 }
 function toggle(it,li){
   it.done=!it.done;it.doneTs=it.done?Date.now():0;save();
@@ -387,12 +401,12 @@ function toggle(it,li){
 function removeItem(it){
   const before=snap();
   items=items.filter(x=>x!==it);save();render();
-  toast('「'+short(it.text)+'」を削除','元に戻す',()=>{items=before;save();render()});
+  toast('「'+short(it.text)+'」を消したのだ','元に戻す',()=>{items=before;save();render()});
 }
 function clearDone(){
   const before=snap(),n=items.filter(x=>x.done).length;if(!n)return;
   items=items.filter(x=>!x.done);save();render();
-  toast('済み '+n+' 件を消しました','元に戻す',()=>{items=before;save();render()});
+  toast('済み '+n+' 件を消したのだ','元に戻す',()=>{items=before;save();render()});
 }
 
 // ---- 表示 ----
@@ -475,7 +489,7 @@ function render(){
   const pend=items.filter(x=>!x.done),dn=items.filter(x=>x.done).sort((a,b)=>b.doneTs-a.doneTs);
   const L=$('list');L.textContent='';
   if(!items.length){
-    const e=h('div','empty');e.append(h('div','big','🛒'),h('div','','買うものはありません'));L.append(e);
+    const e=h('div','empty');e.append(h('div','big','🛒'),h('div','','買うものはないのだ'));L.append(e);
   }else if(!S){
     catGroups(L,pend,()=>undefined);
   }else{
@@ -483,12 +497,12 @@ function render(){
     for(const it of pend){const p=place(it,priceInfo(it.text,recs),S);P.set(it,p);bk[p.b].push(it)}
     const note=it=>{const p=P.get(it);return p&&p.note?{text:p.note,cls:p.cls}:null};
     const head=(t,n)=>{const d=h('div','bh');d.append(h('span','',t),h('span','n',n+' 点'));return d};
-    if(bk.here.length){L.append(head('🛍 '+S+'で買う',bk.here.length));catGroups(L,bk.here,note)}
-    if(bk.any.length){L.append(head('👀 どこでもいい',bk.any.length));catGroups(L,bk.any,note)}
-    if(!bk.here.length&&!bk.any.length&&pend.length)L.append(h('div','none',S+'で買う物はありません'));
+    if(bk.here.length){L.append(head('🛍 '+S+'で買うのだ',bk.here.length));catGroups(L,bk.here,note)}
+    if(bk.any.length){L.append(head('👀 どこでもいいのだ',bk.any.length));catGroups(L,bk.any,note)}
+    if(!bk.here.length&&!bk.any.length&&pend.length)L.append(h('div','none',S+'で買う物はないのだ'));
     if(bk.other.length){
       const b=h('button','bh fold'+(otherOpen?'':' closed'));b.type='button';
-      b.append(h('span','ar','▾'),h('span','','他の店で買う'),h('span','n',bk.other.length+' 点'));
+      b.append(h('span','ar','▾'),h('span','','他の店で買うのだ'),h('span','n',bk.other.length+' 点'));
       b.onclick=()=>{otherOpen=!otherOpen;render()};L.append(b);
       if(otherOpen)catGroups(L,bk.other,note);
     }
@@ -498,15 +512,12 @@ function render(){
   if(dn.length&&doneOpen)dn.forEach(it=>D.append(row(it,recs,null)));
   D.hidden=!doneOpen;
   $('dh').classList.toggle('closed',!doneOpen);
-  $('dcnt').textContent='カゴに入れた '+dn.length;
+  $('dcnt').textContent='カゴに入れたのだ '+dn.length;
   const total=items.length;
   $('bar').style.width=(total?dn.length/total*100:0)+'%';
-  $('ptxt').textContent=!total?'空っぽです':!pend.length?'ぜんぶ買えた 🎉':'あと '+pend.length+' 点';
-  $('pnum').textContent=total?dn.length+' / '+total:'';
-  $('date').textContent=new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
   renderStores();
   renderSug();
-  renderWarn();
+  renderBub();
   updateAddBtn();
 }
 
@@ -655,7 +666,7 @@ function submitAsk(){
   let a=[];try{a=JSON.parse(localStorage.getItem(PC_KEY)||'[]');if(!Array.isArray(a))a=[]}catch(e){}
   a.push({id:uid(),item:r.item,store,price:v,qty:r.qty,unit:r.unit,photo:null,ts:Date.now()});
   try{localStorage.setItem(PC_KEY,JSON.stringify(a))}catch(e){toast('記録できませんでした');return}
-  hideAsk();render();toast('最安くらべに記録しました（'+v.toLocaleString('ja-JP')+'円）');
+  hideAsk();render();toast('最安くらべに記録したのだ（'+v.toLocaleString('ja-JP')+'円）');
 }
 $('askOk').onclick=submitAsk;
 $('askX').onclick=hideAsk;
@@ -673,11 +684,26 @@ function stockFor(text){
     return n===t||(Math.min(n.length,t.length)>=2&&(t.includes(n)||n.includes(t)));
   });
 }
-function renderWarn(){
-  const near=stock.filter(s=>s.exp&&dayNum(s.exp)<=3).sort((a,b)=>a.exp<b.exp?-1:1),w=$('warn');
-  w.hidden=!near.length;
-  if(near.length)w.textContent='🧊 期限が近い：'+near.slice(0,3).map(s=>s.text+'（'+dlabel(dayNum(s.exp))+'）').join('、')+(near.length>3?' ほか':'');
+// ずんだもんの一言。期限が近い物があれば、それを先に知らせる（タップでうちにある物を開く）。ぜんぶ買えたときは、お祝いの全身に替わる
+let bubNear=false;
+function renderBub(){
+  const total=items.length,pend=items.filter(x=>!x.done).length;
+  const near=stock.filter(s=>s.exp&&dayNum(s.exp)<=1).sort((a,b)=>a.exp<b.exp?-1:1);
+  bubNear=near.length>0;
+  const celebrate=total>0&&pend===0&&!near.length;
+  $('fin').hidden=!celebrate;$('bub').hidden=celebrate;
+  if(celebrate){$('finTxt').textContent=total+'つ買ったのだ';return}
+  const say=$('say');say.textContent='';
+  const add=(...ps)=>ps.forEach(p=>{if(p==='\n')say.append(document.createElement('br'));else if(Array.isArray(p))say.append(h('b','',p[0]));else say.append(p)});
+  $('av').classList.toggle('w',bubNear);
+  if(near.length){
+    const n=dayNum(near[0].exp);
+    add(near[0].text+'が',[n<0?'きのうまで':n===0?'きょうまで':'あしたまで'],'なのだ！','\n','先に使うのだ！'+(near.length>1?'（ほか'+(near.length-1)+'つ）':''));
+  }else if(!total)add('なにを買うのだ？');
+  else if(todayStore)add('きょうは',[todayStore],'なのだ！','\n','あと ',[pend+'つ'],' 買うのだ！（'+(total-pend)+'/'+total+'）');
+  else add('あと ',[pend+'つ'],' 買うのだ！（'+(total-pend)+'/'+total+'）');
 }
+$('bub').onclick=()=>{if(bubNear)openPanel('stock')};
 let mode='sets';
 function openPanel(m){
   mode=m;hideToast();hideAsk();renderPanel();
@@ -729,7 +755,6 @@ function renderPanel(){
 }
 $('bSets').onclick=()=>openPanel('sets');
 $('bStock').onclick=()=>openPanel('stock');
-$('warn').onclick=()=>openPanel('stock');
 $('m1').onclick=()=>{mode='sets';renderPanel()};
 $('m2').onclick=()=>{mode='stock';renderPanel()};
 $('s2Ok').onclick=closeSheet;
@@ -741,7 +766,7 @@ $('clr').onclick=clearDone;
 $('dtg').onclick=()=>{doneOpen=!doneOpen;render()};
 $('share').onclick=async()=>{
   const pend=items.filter(x=>!x.done);
-  if(!pend.length){toast('残りの買い物はありません');return}
+  if(!pend.length){toast('残りの買い物はないのだ');return}
   let s='🛒 買い物リスト\n';
   for(const c of CATS){
     const g=pend.filter(x=>x.cat===c.id);if(!g.length)continue;
