@@ -18,6 +18,9 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 16px)}
 main{max-width:520px;margin:0 auto}
+.apps{display:flex;gap:6px;margin:12px 0 4px}
+.apps a{flex:1;text-align:center;padding:8px 6px;border-radius:10px;border:1px solid var(--line);color:var(--sub);text-decoration:none;font-size:14px;background:var(--card)}
+.apps a.cur{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
 h1{font-size:20px;margin:20px 0 12px}
 form{display:flex;gap:8px}
 input{flex:1;min-width:0;font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg)}
@@ -35,6 +38,10 @@ li .del{background:none;color:var(--sub);padding:4px 8px}
 </head>
 <body>
 <main>
+<nav class="apps">
+  <a class="cur" href="https://ageargfbv.github.io/shopping-memo/">買い物メモ</a>
+  <a href="https://ageargfbv.github.io/price-compare/">最安くらべ</a>
+</nav>
 <h1>買い物メモ</h1>
 <form id="f"><input id="t" placeholder="買うものを追加" autocomplete="off"><button>追加</button></form>
 <ul id="list"></ul>
