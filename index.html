@@ -882,9 +882,9 @@ function renderPanel(){
     const f=h('div','sform'),inp=h('input','fld'),sSel=h('select','fld'),sNew=h('input','fld');
     inp.placeholder='定番に入れる物（例：トイレットペーパー）';inp.setAttribute('aria-label','定番に入れる物');
     sSel.setAttribute('aria-label','買う店');
-    const so0=h('option','','店：どこでも');so0.value='';sSel.append(so0);
-    stores.forEach(n=>{const o=h('option','','店：'+n);o.value=n;if(S&&norm(n)===norm(S))o.selected=true;sSel.append(o)});
-    const soN=h('option','','店：＋ 新しい店…');soN.value='__new';sSel.append(soN);
+    const so0=h('option','','どこでも');so0.value='';sSel.append(so0);
+    stores.forEach(n=>{const o=h('option','',n);o.value=n;if(S&&norm(n)===norm(S))o.selected=true;sSel.append(o)});
+    const soN=h('option','','＋ 新しい店…');soN.value='__new';sSel.append(soN);
     sNew.placeholder='新しい店の名前';sNew.setAttribute('aria-label','新しい店の名前');sNew.hidden=true;
     sSel.onchange=()=>{sNew.hidden=sSel.value!=='__new'};
     const ad=h('button','sadd','追加');ad.type='button';
