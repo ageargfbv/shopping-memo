@@ -40,6 +40,13 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 .add{display:flex;gap:8px;background:var(--card);border-radius:18px;padding:6px 6px 6px 16px;box-shadow:var(--shadow);align-items:center}
 .add input{flex:1;min-width:0;border:0;background:none;outline:0;padding:10px 0;font-size:17px}
 .add input::placeholder{color:var(--sub)}
+[hidden]{display:none!important}
+.pick{background:var(--card);border-radius:16px;padding:8px 14px 10px;margin-top:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.pkrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 0}
+.pkrow .lb{width:100%;font-size:12px;color:var(--sub);font-weight:700}
+.pkrow input{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:7px 13px;font-size:14px;outline:0}
+.add .stbtn{width:auto;max-width:132px;height:36px;padding:0 12px;border-radius:99px;background:var(--card2);color:var(--fg);font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.add .stbtn.on{background:var(--soft);color:var(--acc)}
 .add button{width:44px;height:44px;border-radius:14px;background:var(--acc);color:#fff;font-size:26px;line-height:1;display:grid;place-items:center;transition:transform .12s}
 .add button:active{transform:scale(.92)}
 
@@ -101,8 +108,31 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 /* 編集シート */
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #ov.open{opacity:1;pointer-events:auto}
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s .28s;max-width:560px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:92vh;overflow:auto}
-#sheet.open{transform:none;visibility:visible;transition-delay:0s}
+#sheet,#sheet2{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s .28s;max-width:560px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:92vh;overflow:auto}
+#sheet.open,#sheet2.open{transform:none;visibility:visible;transition-delay:0s}
+.tools{display:flex;gap:8px}
+.warn{display:block;width:100%;margin-top:12px;text-align:left;background:#fff4dc;color:#8a5a00;border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600}
+@media (prefers-color-scheme:dark){.warn{background:#3a2f12;color:#f3c76a}}
+.seg{display:flex;gap:8px;margin-bottom:10px}
+.seg button{flex:1;padding:11px;border-radius:12px;background:var(--card2);font-weight:700;font-size:15px;color:var(--sub)}
+.seg button.on{background:var(--acc);color:#fff}
+.srow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sname{flex:1;min-width:0}
+.sname b{display:block;font-size:16px}
+.sname .sub{display:block;font-size:12.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sname .late{color:var(--danger);font-weight:700}
+.sname .soon{color:#b7791f;font-weight:700}
+.sadd{flex:none;padding:9px 14px;border-radius:12px;background:var(--acc);color:#fff;font-weight:700;font-size:14px}
+.sdel{flex:none;color:var(--sub);padding:8px;font-size:16px}
+.sform{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.sform .fld{flex:1;min-width:140px}
+.stk{color:#b7791f;font-weight:600}
+#ask{position:fixed;left:50%;bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 14px);transform:translate(-50%,20px);background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:10px 12px;display:flex;gap:8px;align-items:center;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;width:calc(100% - 24px);max-width:536px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#ask.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#ask span{flex:1;min-width:0;line-height:1.3}
+#ask input{width:84px;border:1px solid var(--line);background:var(--card2);border-radius:10px;padding:9px 10px;font-size:17px;outline:0;text-align:right}
+#ask #askOk{background:var(--acc);color:#fff;border-radius:10px;padding:9px 14px;font-weight:700}
+#ask #askX{color:var(--sub);padding:6px}
 .grab{width:40px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 12px}
 .fld{display:block;width:100%;border:1px solid var(--line);background:var(--card2);border-radius:12px;padding:12px 14px;font-size:17px;outline:0}
 .fld:focus{border-color:var(--acc)}
@@ -137,7 +167,11 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
   <div class="hero-in">
     <div class="top">
       <div><div class="date" id="date"></div><h1>買い物メモ</h1></div>
-      <button class="ico" id="share" aria-label="リストを共有">⤴</button>
+      <div class="tools">
+        <button class="ico" id="bSets" aria-label="セット">📋</button>
+        <button class="ico" id="bStock" aria-label="うちにある物">🧊</button>
+        <button class="ico" id="share" aria-label="リストを共有">⤴</button>
+      </div>
     </div>
     <div class="prog"><div class="bar"><i id="bar"></i></div><div class="ptxt"><span id="ptxt"></span><span id="pnum"></span></div></div>
   </div>
@@ -145,8 +179,11 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 <main>
   <form id="f" class="add" autocomplete="off">
     <input id="t" placeholder="買うものを追加" enterkeyhint="done" autocapitalize="none" autocomplete="off" aria-label="買うもの">
+    <button type="button" class="stbtn" id="addSt" aria-label="買う店を選ぶ">🏪 おまかせ</button>
     <button aria-label="追加">＋</button>
   </form>
+  <div class="pick" id="addStRow" hidden></div>
+  <button class="warn" id="warn" hidden></button>
   <div class="sug" id="tstore"></div>
   <div class="sug" id="sug"></div>
   <div id="list"></div>
@@ -174,6 +211,13 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
   <input class="fld" id="sMemo" placeholder="例：国産、赤" autocomplete="off" aria-label="メモ">
   <div class="acts"><button class="del" id="sDel">削除</button><button class="ok" id="sOk">完了</button></div>
 </div>
+<div id="sheet2" role="dialog" aria-modal="true" aria-label="セットとうちにある物">
+  <div class="grab"></div>
+  <div class="seg"><button id="m1">📋 セット</button><button id="m2">🧊 うちにある物</button></div>
+  <div id="p2"></div>
+  <div class="acts"><button class="ok" id="s2Ok">閉じる</button></div>
+</div>
+<div id="ask"><span id="askMsg"></span><input id="askIn" type="number" inputmode="numeric" min="1" placeholder="円" aria-label="値段"><button id="askOk">記録</button><button id="askX" aria-label="閉じる">✕</button></div>
 <div id="toast"><span id="tmsg"></span><button id="tact" hidden></button></div>
 
 <script>
@@ -205,8 +249,14 @@ items=items.filter(x=>x&&typeof x.text==='string'&&x.text.trim()).map((x,i)=>({
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items));localStorage.setItem(HKEY,JSON.stringify(hist))}catch(e){}};
 // 今日行く店（12時間だけ覚えておく）。autoName は現在地から選んだ店、manualAt は手で選んだ時刻
 const SKEY='shopping-memo-store-v1';
-let todayStore='',autoName='',manualAt=0,RECS=[];
+let todayStore='',autoName='',manualAt=0,RECS=[],addStore='',addCat='';
 try{const o=JSON.parse(localStorage.getItem(SKEY)||'null');if(o&&o.name&&Date.now()-o.ts<12*3600e3)todayStore=o.name}catch(e){}
+// 定番セットと、うちにある物（期限つき）
+const SETKEY='shopping-memo-sets-v1',STKEY='shopping-memo-stock-v1';
+let sets=[],stock=[];
+try{const a=JSON.parse(localStorage.getItem(SETKEY)||'[]');if(Array.isArray(a))sets=a.filter(s=>s&&s.name&&Array.isArray(s.items))}catch(e){}
+try{const a=JSON.parse(localStorage.getItem(STKEY)||'[]');if(Array.isArray(a))stock=a.filter(s=>s&&s.text)}catch(e){}
+const saveX=()=>{try{localStorage.setItem(SETKEY,JSON.stringify(sets));localStorage.setItem(STKEY,JSON.stringify(stock))}catch(e){}};
 
 // ---- 最安くらべ（同じサイトの別アプリ）の記録を読む ----
 const PC_KEY='price-compare-v1',DAY=86400000;
@@ -275,6 +325,7 @@ function place(it,info,S){
 // ---- 通知と取り消し ----
 let toastTimer=0;
 function toast(msg,label,fn){
+  hideAsk();
   $('tmsg').textContent=msg;
   const b=$('tact');b.hidden=!label;
   if(label){b.textContent=label;b.onclick=()=>{hideToast();fn&&fn()}}
@@ -286,6 +337,23 @@ const snap=()=>JSON.parse(JSON.stringify(items));
 const short=s=>s.length>12?s.slice(0,12)+'…':s;
 
 // ---- 追加・変更 ----
+// 追加するときの店：選んであればその店。選んでいなくても、現在地から店を選んでいる間はその店
+const effStore=()=>addStore||(autoName&&todayStore?todayStore:'');
+// 1品を足す。同じ物が入っていれば数を足すか、済みならリストに戻す。戻り値は知らせる文（無ければ ''）
+function putItem(text,qty,store,cat){
+  let msg='';
+  const same=items.find(x=>x.text.toLowerCase()===text.toLowerCase());
+  if(same){
+    if(store)same.store=store;
+    if(cat)same.cat=cat;
+    if(same.done){same.done=false;same.doneTs=0;same.qty=qty;msg='「'+short(text)+'」をリストに戻しました'}
+    else{same.qty=Math.min(99,same.qty+qty);msg='「'+short(text)+'」は入っていたので ×'+same.qty+' にしました'}
+  }else{
+    items.push({id:uid(),text,done:false,qty,memo:'',store:store||'',cat:cat||guess(text),ts:Date.now(),doneTs:0});
+  }
+  hist[text]=(hist[text]||0)+1;
+  return msg;
+}
 function addText(raw){
   const parts=raw.split(/[、,，\n]+/).map(s=>s.trim()).filter(Boolean);
   let msg='';
@@ -293,21 +361,21 @@ function addText(raw){
     let text=p,qty=1;
     const m=p.match(/^(.*?)\s*[×xX＊*]\s*(\d{1,2})$/);
     if(m&&m[1].trim()){text=m[1].trim();qty=+m[2]}
-    const same=items.find(x=>x.text.toLowerCase()===text.toLowerCase());
-    if(same){
-      if(same.done){same.done=false;same.doneTs=0;same.qty=qty;msg='「'+short(text)+'」をリストに戻しました'}
-      else{same.qty=Math.min(99,same.qty+qty);msg='「'+short(text)+'」は入っていたので ×'+same.qty+' にしました'}
-    }else{
-      items.push({id:uid(),text,done:false,qty,memo:'',store:'',cat:guess(text),ts:Date.now(),doneTs:0});
-    }
-    hist[text]=(hist[text]||0)+1;
+    msg=putItem(text,qty,effStore(),addCat)||msg;
   }
+  addCat='';   // 売り場はその1回だけ。店は次も同じ店で足せるように残す
   save();render();
   if(msg)toast(msg);
+}
+function addSet(s){
+  let n=0;
+  for(const x of s.items){putItem(x.text,x.qty||1,effStore());n++}
+  save();closeSheet();toast('セット「'+short(s.name)+'」の '+n+' 点を追加しました');
 }
 function toggle(it,li){
   it.done=!it.done;it.doneTs=it.done?Date.now():0;save();
   li.classList.add('pop');setTimeout(render,it.done?240:120);
+  if(it.done)askPrice(it);else hideAsk();
 }
 function removeItem(it){
   const before=snap();
@@ -335,6 +403,8 @@ function row(it,recs,note){
     const st=h('span','st',it.store),hu=hue(it.store);
     st.style.color='hsl('+hu+',55%,38%)';st.style.background='hsla('+hu+',65%,50%,.16)';meta.append(st);
   }
+  const sk=it.done?null:stockFor(it.text);
+  if(sk)meta.append(h('span','stk','🧊 家にあります'+(sk.exp?'（'+md(sk.exp)+'まで）':'')));
   const ph=it.done?null:(note!==undefined?note:priceHint(it.text,recs));
   if(ph){const p=h('span','p'+(ph.cls?' '+ph.cls:''),ph.text);if(ph.old)p.append(h('span','old',' ('+ph.old+')'));meta.append(p)}
   if(it.memo)meta.append(h('span','m',it.memo));
@@ -429,6 +499,8 @@ function render(){
   $('date').textContent=new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
   renderStores();
   renderSug();
+  renderWarn();
+  updateAddBtn();
 }
 
 // ---- 今日の店 ----
@@ -513,7 +585,7 @@ function renderStoreChips(){
 }
 $('sStore').oninput=()=>{if(cur){cur.store=$('sStore').value.trim();save()}};
 function closeSheet(){
-  $('ov').classList.remove('open');$('sheet').classList.remove('open');
+  $('ov').classList.remove('open');$('sheet').classList.remove('open');$('sheet2').classList.remove('open');
   if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
   cur=null;render();
 }
@@ -525,8 +597,138 @@ $('sOk').onclick=closeSheet;
 $('ov').onclick=closeSheet;
 $('sDel').onclick=()=>{const it=cur;if(!it)return;$('ov').classList.remove('open');$('sheet').classList.remove('open');cur=null;removeItem(it)};
 
+// ---- 追加するときの売り場・店の選択 ----
+function updateAddBtn(){
+  const b=$('addSt'),s=effStore(),parts=[];
+  if(addCat)parts.push(CAT[addCat].ico+CAT[addCat].name);
+  if(s)parts.push((!addStore?'📍':'')+s);
+  b.textContent=parts.length?parts.join('・'):'🏪 店・売り場';
+  b.classList.toggle('on',parts.length>0);
+}
+function renderPick(){
+  const box=$('addStRow');box.textContent='';
+  const row=label=>{const r=h('div','pkrow');r.append(h('span','lb',label));box.append(r);return r};
+  const r1=row('売り場（この1回だけ）');
+  const mk=(r,label,on,fn)=>{const b=h('button','chip'+(on?' on':''),label);b.type='button';b.onclick=fn;r.append(b)};
+  mk(r1,'おまかせ',!addCat,()=>{addCat='';updateAddBtn();renderPick()});
+  CATS.forEach(c=>mk(r1,c.ico+' '+c.name,addCat===c.id,()=>{addCat=addCat===c.id?'':c.id;updateAddBtn();renderPick()}));
+  const r2=row('店（選ぶと、次に足す物も同じ店）');
+  mk(r2,autoName&&todayStore?'おまかせ（📍'+todayStore+'）':'おまかせ',!addStore,()=>{addStore='';updateAddBtn();renderPick()});
+  knownStores().forEach(n=>mk(r2,n,addStore&&norm(addStore)===norm(n),()=>{addStore=norm(addStore)===norm(n)?'':n;updateAddBtn();renderPick()}));
+  const inp=h('input');inp.placeholder='新しい店を入れる';inp.setAttribute('aria-label','新しい店');
+  const setNew=()=>{const v=inp.value.trim();if(v){addStore=v;updateAddBtn();renderPick()}};
+  inp.onchange=setNew;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();setNew()}};
+  r2.append(inp);
+}
+$('addSt').onclick=()=>{const b=$('addStRow');b.hidden=!b.hidden;if(!b.hidden)renderPick()};
+
+// ---- 買った値段を、最安くらべの記録に足す ----
+function lastRec(text){
+  const t=text.trim().toLowerCase();let name=null;
+  for(const r of RECS){const n=r.item.trim().toLowerCase();if(n.length>=2&&t.includes(n)&&(!name||n.length>name.length))name=n}
+  if(!name)return null;
+  return RECS.filter(r=>r.item.trim().toLowerCase()===name).reduce((a,b)=>b.ts>a.ts?b:a);
+}
+let askTimer=0,askCtx=null;
+function askPrice(it){
+  const r=lastRec(it.text),store=(it.store||todayStore||'').trim();
+  if(!r||!store)return;                      // 前の記録（量・単位）か、買う店が分からない品は聞かない
+  const canon=knownStores().find(n=>sameStore(n,store))||store;
+  askCtx={r,store:canon};
+  $('askMsg').textContent=canon+'で '+it.text+' '+r.qty+r.unit+' いくら？';
+  $('askIn').value='';
+  hideToast();$('ask').classList.add('on');
+  clearTimeout(askTimer);askTimer=setTimeout(()=>{if(document.activeElement!==$('askIn'))hideAsk()},12000);
+}
+function hideAsk(){$('ask').classList.remove('on');askCtx=null;if(document.activeElement===$('askIn'))$('askIn').blur()}
+function submitAsk(){
+  const v=Math.round(Number($('askIn').value));
+  if(!askCtx||!(v>0))return;
+  const r=askCtx.r,store=askCtx.store;
+  let a=[];try{a=JSON.parse(localStorage.getItem(PC_KEY)||'[]');if(!Array.isArray(a))a=[]}catch(e){}
+  a.push({id:uid(),item:r.item,store,price:v,qty:r.qty,unit:r.unit,photo:null,ts:Date.now()});
+  try{localStorage.setItem(PC_KEY,JSON.stringify(a))}catch(e){toast('記録できませんでした');return}
+  hideAsk();render();toast('最安くらべに記録しました（'+v.toLocaleString('ja-JP')+'円）');
+}
+$('askOk').onclick=submitAsk;
+$('askX').onclick=hideAsk;
+$('askIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submitAsk()}};
+
+// ---- 定番セットと、うちにある物 ----
+const dayNum=exp=>{const t=new Date();t.setHours(0,0,0,0);return Math.round((new Date(exp+'T00:00:00')-t)/DAY)};
+const dlabel=n=>n<0?'期限切れ':n===0?'今日まで':n===1?'明日まで':'あと'+n+'日';
+const md=exp=>{const p=exp.split('-');return Number(p[1])+'/'+Number(p[2])};
+function stockFor(text){
+  const t=norm(text);
+  return stock.find(s=>{
+    const n=norm(s.text);
+    if(!n||(s.exp&&dayNum(s.exp)<0))return false;
+    return n===t||(Math.min(n.length,t.length)>=2&&(t.includes(n)||n.includes(t)));
+  });
+}
+function renderWarn(){
+  const near=stock.filter(s=>s.exp&&dayNum(s.exp)<=3).sort((a,b)=>a.exp<b.exp?-1:1),w=$('warn');
+  w.hidden=!near.length;
+  if(near.length)w.textContent='🧊 期限が近い：'+near.slice(0,3).map(s=>s.text+'（'+dlabel(dayNum(s.exp))+'）').join('、')+(near.length>3?' ほか':'');
+}
+let mode='sets';
+function openPanel(m){
+  mode=m;hideToast();hideAsk();renderPanel();
+  $('ov').classList.add('open');$('sheet2').classList.add('open');
+}
+function renderPanel(){
+  $('m1').classList.toggle('on',mode==='sets');$('m2').classList.toggle('on',mode==='stock');
+  const box=$('p2');box.textContent='';
+  if(mode==='sets'){
+    if(!sets.length)box.append(h('div','none','セットはまだありません'));
+    sets.forEach(s=>{
+      const r=h('div','srow'),nm=h('div','sname');
+      nm.append(h('b','',s.name),h('span','sub',s.items.length+' 点：'+s.items.map(x=>x.text).join('、')));
+      const add=h('button','sadd','追加');add.type='button';add.onclick=()=>addSet(s);
+      const del=h('button','sdel','✕');del.type='button';del.setAttribute('aria-label',s.name+'を削除');
+      del.onclick=()=>{const before=JSON.parse(JSON.stringify(sets));sets=sets.filter(x=>x!==s);saveX();renderPanel();toast('セット「'+short(s.name)+'」を削除','元に戻す',()=>{sets=before;saveX();if($('sheet2').classList.contains('open'))renderPanel()})};
+      r.append(nm,add,del);box.append(r);
+    });
+    const f=h('div','sform'),inp=h('input','fld');inp.placeholder='セット名（例：毎週の買い物）';inp.setAttribute('aria-label','セット名');
+    const sv=h('button','sadd','今のリストを保存');sv.type='button';
+    sv.onclick=()=>{
+      const name=inp.value.trim();
+      if(!items.length){toast('リストが空です');return}
+      if(!name){toast('セット名を入れてください');return}
+      sets.push({id:uid(),name,items:items.map(x=>({text:x.text,qty:x.qty}))});saveX();renderPanel();toast('セット「'+short(name)+'」を保存しました');
+    };
+    f.append(inp,sv);box.append(f);
+  }else{
+    const list=[...stock].sort((a,b)=>(a.exp||'9999-99-99')<(b.exp||'9999-99-99')?-1:1);
+    if(!list.length)box.append(h('div','none','登録した物はありません'));
+    list.forEach(s=>{
+      const r=h('div','srow'),nm=h('div','sname');
+      const sub=h('span','sub');
+      if(s.exp){const n=dayNum(s.exp);sub.textContent=md(s.exp)+'まで（'+dlabel(n)+'）';if(n<0)sub.className='sub late';else if(n<=3)sub.className='sub soon'}
+      else sub.textContent='期限なし';
+      nm.append(h('b','',s.text),sub);
+      const del=h('button','sdel','✕');del.type='button';del.setAttribute('aria-label',s.text+'を削除');
+      del.onclick=()=>{const before=JSON.parse(JSON.stringify(stock));stock=stock.filter(x=>x!==s);saveX();renderPanel();render();toast('「'+short(s.text)+'」を削除','元に戻す',()=>{stock=before;saveX();render();if($('sheet2').classList.contains('open'))renderPanel()})};
+      r.append(nm,del);box.append(r);
+    });
+    const f=h('div','sform'),nmI=h('input','fld'),dI=h('input','fld');
+    nmI.placeholder='物の名前（例：牛乳）';nmI.setAttribute('aria-label','物の名前');
+    dI.type='date';dI.setAttribute('aria-label','期限');
+    const ad=h('button','sadd','追加');ad.type='button';
+    const go=()=>{const v=nmI.value.trim();if(!v)return;stock.push({id:uid(),text:v,exp:dI.value||''});saveX();renderPanel();render()};
+    ad.onclick=go;nmI.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+    f.append(nmI,dI,ad);box.append(f);
+  }
+}
+$('bSets').onclick=()=>openPanel('sets');
+$('bStock').onclick=()=>openPanel('stock');
+$('warn').onclick=()=>openPanel('stock');
+$('m1').onclick=()=>{mode='sets';renderPanel()};
+$('m2').onclick=()=>{mode='stock';renderPanel()};
+$('s2Ok').onclick=closeSheet;
+
 // ---- 入力・共有・そのほか ----
-$('f').onsubmit=e=>{e.preventDefault();const v=$('t').value.trim();if(!v)return;$('t').value='';addText(v)};
+$('f').onsubmit=e=>{e.preventDefault();const v=$('t').value.trim();if(!v)return;$('t').value='';$('addStRow').hidden=true;addText(v)};
 $('t').oninput=renderSug;
 $('clr').onclick=clearDone;
 $('dtg').onclick=()=>{doneOpen=!doneOpen;render()};
