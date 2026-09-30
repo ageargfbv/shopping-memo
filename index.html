@@ -223,6 +223,13 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 <script>
 const KEY='shopping-memo-v1',HKEY='shopping-memo-hist-v1';
 const $=id=>document.getElementById(id);
+// 2026-09-30 本人の依頼：入力済みの情報をいったん全部消す。この端末で最初に開いた1回だけ（印を残すので、あとは消さない）。最安くらべの記録には触らない
+try{
+  if(localStorage.getItem('shopping-memo-reset')!=='2026-09-30'){
+    ['shopping-memo-v1','shopping-memo-hist-v1','shopping-memo-store-v1','shopping-memo-sets-v1','shopping-memo-stock-v1'].forEach(k=>localStorage.removeItem(k));
+    localStorage.setItem('shopping-memo-reset','2026-09-30');
+  }
+}catch(e){}
 const CATS=[
   {id:'veg',name:'野菜・果物',ico:'🥬',c:'#2f9e5b',kw:['野菜','キャベツ','レタス','にんじん','人参','玉ねぎ','たまねぎ','玉葱','じゃがいも','ジャガイモ','トマト','きゅうり','キュウリ','なす','ナス','茄子','ほうれん草','ねぎ','ネギ','大根','白菜','ブロッコリー','ピーマン','もやし','きのこ','しいたけ','椎茸','えのき','しめじ','かぼちゃ','ごぼう','れんこん','アボカド','レモン','りんご','リンゴ','バナナ','みかん','ミカン','いちご','イチゴ','ぶどう','ブドウ','果物','フルーツ','柿','梨','桃','キウイ','にんにく','ニンニク','生姜','しょうが','小松菜','水菜','セロリ','パプリカ','オクラ','枝豆','とうもろこし','さつまいも','サツマイモ','里芋','ズッキーニ','カボチャ','ミニトマト','スイカ','メロン','みょうが','しそ','パセリ']},
   {id:'dairy',name:'卵・乳・豆腐',ico:'🥚',c:'#f0a30a',kw:['牛乳','卵','たまご','玉子','ヨーグルト','チーズ','バター','豆腐','納豆','生クリーム','マーガリン','油揚げ','豆乳','厚揚げ']},
