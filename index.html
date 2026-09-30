@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>買い物メモ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#2f855a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="買い物メモ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{--bg:#f6f7f5;--card:#fff;--fg:#1c1f1d;--sub:#6b726d;--acc:#2f855a;--line:#e2e5e1}
+@media (prefers-color-scheme:dark){:root{--bg:#141614;--card:#1f221f;--fg:#eceeeb;--sub:#9aa19c;--acc:#48bb78;--line:#2e332e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;padding:env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 16px)}
+main{max-width:520px;margin:0 auto}
+h1{font-size:20px;margin:20px 0 12px}
+form{display:flex;gap:8px}
+input{flex:1;min-width:0;font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg)}
+button{font:inherit;border:0;border-radius:10px;padding:12px 16px;background:var(--acc);color:#fff}
+ul{list-style:none;margin:16px 0;padding:0;background:var(--card);border-radius:12px;border:1px solid var(--line)}
+li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li label{flex:1;display:flex;align-items:center;gap:12px}
+li input[type=checkbox]{flex:none;width:22px;height:22px;accent-color:var(--acc)}
+li.done span{text-decoration:line-through;color:var(--sub)}
+li .del{background:none;color:var(--sub);padding:4px 8px}
+.foot{display:flex;justify-content:space-between;color:var(--sub);font-size:14px}
+.foot button{background:none;color:var(--sub);padding:0}
+</style>
+</head>
+<body>
+<main>
+<h1>買い物メモ</h1>
+<form id="f"><input id="t" placeholder="買うものを追加" autocomplete="off"><button>追加</button></form>
+<ul id="list"></ul>
+<div class="foot"><span id="cnt"></span><button id="clr">済みを消す</button></div>
+</main>
+<script>
+const KEY='shopping-memo-v1';
+let items=[];
+try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}};
+const $=id=>document.getElementById(id);
+function render(){
+  const ul=$('list');ul.textContent='';
+  items.forEach((it,i)=>{
+    const li=document.createElement('li');if(it.done)li.className='done';
+    const lb=document.createElement('label');
+    const cb=document.createElement('input');cb.type='checkbox';cb.checked=it.done;
+    cb.onchange=()=>{it.done=cb.checked;save();render()};
+    const sp=document.createElement('span');sp.textContent=it.text;
+    lb.append(cb,sp);
+    const d=document.createElement('button');d.className='del';d.textContent='✕';d.setAttribute('aria-label','削除');
+    d.onclick=()=>{items.splice(i,1);save();render()};
+    li.append(lb,d);ul.append(li);
+  });
+  $('cnt').textContent=items.filter(x=>!x.done).length+' 件 残り';
+}
+$('f').onsubmit=e=>{e.preventDefault();const v=$('t').value.trim();if(!v)return;items.push({text:v,done:false});$('t').value='';save();render()};
+$('clr').onclick=()=>{items=items.filter(x=>!x.done);save();render()};
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+</script>
+</body>
+</html>
