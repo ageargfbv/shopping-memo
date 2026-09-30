@@ -196,6 +196,7 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
       <div class="logo"><i>🛒</i>ずんだメモ</div>
       <div class="tools">
         <button class="ico" id="bSets" aria-label="セット">📋</button>
+        <button class="ico" id="bReg" aria-label="定番">🔁</button>
         <button class="ico" id="bStock" aria-label="うちにある物">🧊</button>
         <button class="ico" id="share" aria-label="リストを共有">⤴</button>
       </div>
@@ -297,7 +298,7 @@ try{const a=JSON.parse(localStorage.getItem(SETKEY)||'[]');if(Array.isArray(a))s
 try{const a=JSON.parse(localStorage.getItem(STKEY)||'[]');if(Array.isArray(a))stock=a.filter(s=>s&&s.text)}catch(e){}
 // 定番（毎回「いる／いらない」を選ぶ物）と、買った日の記録（間隔を自動で覚える）
 const REGKEY='shopping-memo-reg-v1',LOGKEY='shopping-memo-log-v1';
-let reg=[],buyLog={},regSel=new Set(),regOther=false;
+let reg=[],buyLog={},regSel=new Set(),regOther=false,regNewFor='';
 try{const a=JSON.parse(localStorage.getItem(REGKEY)||'[]');if(Array.isArray(a))reg=a.filter(s=>s&&s.text)}catch(e){}
 try{const o=JSON.parse(localStorage.getItem(LOGKEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))buyLog=o}catch(e){}
 const saveX=()=>{try{localStorage.setItem(SETKEY,JSON.stringify(sets));localStorage.setItem(STKEY,JSON.stringify(stock));localStorage.setItem(REGKEY,JSON.stringify(reg))}catch(e){}};
@@ -794,7 +795,7 @@ function renderBub(){
 $('bub').onclick=()=>{if(bubNear)openPanel('stock')};
 let mode='sets';
 function openPanel(m){
-  mode=m;hideToast();hideAsk();if(m==='reg')selectAllReg();renderPanel();
+  mode=m;regNewFor='';hideToast();hideAsk();if(m==='reg')selectAllReg();renderPanel();
   $('ov').classList.add('open');$('sheet2').classList.add('open');
 }
 function renderPanel(){
@@ -831,10 +832,21 @@ function renderPanel(){
       const sel=h('select','sel');sel.setAttribute('aria-label',s.text+'の店');
       const opts=['',...stores];if(so(s)&&!opts.some(o=>norm(o)===norm(so(s))))opts.push(so(s));
       opts.forEach(o=>{const op=h('option','',o||'どこでも');op.value=o;if(norm(o)===norm(so(s)))op.selected=true;sel.append(op)});
-      sel.onchange=()=>{s.store=sel.value;saveX();renderPanel()};
+      const opN=h('option','','＋ 新しい店…');opN.value='__new';sel.append(opN);
+      sel.onchange=()=>{if(sel.value==='__new'){regNewFor=s.id;renderPanel();return}s.store=sel.value;saveX();renderPanel()};
       const del=h('button','sdel','✕');del.type='button';del.setAttribute('aria-label',s.text+'を定番から外す');
       del.onclick=()=>{const before=JSON.parse(JSON.stringify(reg));reg=reg.filter(x=>x!==s);saveX();renderPanel();toast('「'+short(s.text)+'」を定番から外したのだ','元に戻す',()=>{reg=before;saveX();if($('sheet2').classList.contains('open'))renderPanel()})};
-      r.append(ck,nm,sel,del);return r;
+      r.append(ck,nm,sel,del);
+      const wrap=h('div');wrap.append(r);
+      if(regNewFor===s.id){
+        const nf=h('div','sform'),ni=h('input','fld');ni.placeholder='新しい店の名前';ni.setAttribute('aria-label','新しい店の名前');
+        const ok=h('button','sadd','きめる');ok.type='button';
+        const go2=()=>{const v=ni.value.trim();if(!v)return;s.store=v;regNewFor='';saveX();renderPanel()};
+        ok.onclick=go2;ni.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go2()}};
+        const cn=h('button','sdel','✕');cn.type='button';cn.setAttribute('aria-label','やめる');cn.onclick=()=>{regNewFor='';renderPanel()};
+        nf.append(ni,ok,cn);nf.style.marginTop='0';wrap.append(nf);
+      }
+      return wrap;
     };
     // 店ごとの見出しにまとめる。今日の店が決まっていれば、その店と「どこでも」を上に、他の店は折りたたむ
     const groups=[];
@@ -867,14 +879,22 @@ function renderPanel(){
       save();closeSheet();toast('定番から '+c+' 点を足したのだ');
     };
     box.append(go);
-    const f=h('div','sform'),inp=h('input','fld'),sI=h('input','fld'),dl=h('datalist');
+    const f=h('div','sform'),inp=h('input','fld'),sSel=h('select','fld'),sNew=h('input','fld');
     inp.placeholder='定番に入れる物（例：トイレットペーパー）';inp.setAttribute('aria-label','定番に入れる物');
-    dl.id='regStoreList';stores.forEach(n=>{const o=h('option');o.value=n;dl.append(o)});
-    sI.setAttribute('list','regStoreList');sI.placeholder='店（空ならどこでも）';sI.setAttribute('aria-label','店');sI.value=S||'';
+    sSel.setAttribute('aria-label','買う店');
+    const so0=h('option','','店：どこでも');so0.value='';sSel.append(so0);
+    stores.forEach(n=>{const o=h('option','','店：'+n);o.value=n;if(S&&norm(n)===norm(S))o.selected=true;sSel.append(o)});
+    const soN=h('option','','店：＋ 新しい店…');soN.value='__new';sSel.append(soN);
+    sNew.placeholder='新しい店の名前';sNew.setAttribute('aria-label','新しい店の名前');sNew.hidden=true;
+    sSel.onchange=()=>{sNew.hidden=sSel.value!=='__new'};
     const ad=h('button','sadd','追加');ad.type='button';
-    const add=()=>{const v=inp.value.trim();if(!v)return;const id=uid();reg.push({id,text:v,qty:1,cat:guess(v),store:sI.value.trim()});regSel.add(id);saveX();renderPanel()};
+    const add=()=>{
+      const v=inp.value.trim();if(!v)return;
+      const st=sSel.value==='__new'?sNew.value.trim():sSel.value;
+      const id=uid();reg.push({id,text:v,qty:1,cat:guess(v),store:st});regSel.add(id);saveX();renderPanel();
+    };
     ad.onclick=add;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
-    f.append(inp,sI,ad,dl);box.append(f);
+    f.append(inp,sSel,sNew,ad);box.append(f);
   }else{
     const list=[...stock].sort((a,b)=>(a.exp||'9999-99-99')<(b.exp||'9999-99-99')?-1:1);
     if(!list.length)box.append(h('div','none','登録した物はありません'));
@@ -898,6 +918,7 @@ function renderPanel(){
   }
 }
 $('bSets').onclick=()=>openPanel('sets');
+$('bReg').onclick=()=>openPanel('reg');
 $('bStock').onclick=()=>openPanel('stock');
 $('m1').onclick=()=>{mode='sets';renderPanel()};
 $('m2').onclick=()=>{mode='stock';renderPanel()};
