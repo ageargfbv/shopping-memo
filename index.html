@@ -101,8 +101,8 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 /* 編集シート */
 #ov{position:fixed;inset:0;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .22s;z-index:30}
 #ov.open{opacity:1;pointer-events:auto}
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-width:560px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:92vh;overflow:auto}
-#sheet.open{transform:none}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-radius:22px 22px 0 0;padding:10px 18px calc(env(safe-area-inset-bottom) + 18px);transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility 0s .28s;max-width:560px;margin:0 auto;box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:92vh;overflow:auto}
+#sheet.open{transform:none;visibility:visible;transition-delay:0s}
 .grab{width:40px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 12px}
 .fld{display:block;width:100%;border:1px solid var(--line);background:var(--card2);border-radius:12px;padding:12px 14px;font-size:17px;outline:0}
 .fld:focus{border-color:var(--acc)}
@@ -112,7 +112,15 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
 .qty button:active{background:var(--soft)}
 .qty b{min-width:40px;text-align:center;font-size:22px}
 .cats{display:flex;flex-wrap:wrap;gap:8px}
-.cats .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.meta .p.w{color:#b7791f}
+.meta .st{border-radius:6px;padding:0 6px;font-weight:700}
+.bh{display:flex;align-items:center;margin:24px 4px 0;font-size:15px;font-weight:800}
+.bh .n{margin-left:auto;font-size:12px;font-weight:600;color:var(--sub)}
+.bh.fold{width:calc(100% - 8px);text-align:left;color:var(--sub)}
+.bh.fold .ar{display:inline-block;margin-right:6px;transition:transform .2s}
+.bh.fold.closed .ar{transform:rotate(-90deg)}
+.none{text-align:center;color:var(--sub);padding:28px 0 4px}
 .acts{display:flex;gap:10px;margin-top:20px}
 .acts button{flex:1;padding:14px;border-radius:14px;font-weight:700;font-size:16px}
 .acts .del{background:var(--card2);color:var(--danger)}
@@ -139,6 +147,7 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
     <input id="t" placeholder="買うものを追加" enterkeyhint="done" autocapitalize="none" autocomplete="off" aria-label="買うもの">
     <button aria-label="追加">＋</button>
   </form>
+  <div class="sug" id="tstore"></div>
   <div class="sug" id="sug"></div>
   <div id="list"></div>
   <section id="doneSec" hidden>
@@ -158,6 +167,9 @@ main{max-width:560px;margin:-28px auto 0;padding:0 16px}
   <div class="qty"><button id="qm" aria-label="減らす">−</button><b id="qn">1</b><button id="qp" aria-label="増やす">＋</button></div>
   <div class="lbl">売り場</div>
   <div class="cats" id="cats"></div>
+  <div class="lbl">買う店</div>
+  <div class="cats" id="stores"></div>
+  <input class="fld" id="sStore" placeholder="店を追加（例：サンディ）" autocomplete="off" aria-label="店を追加" style="margin-top:8px">
   <div class="lbl">メモ</div>
   <input class="fld" id="sMemo" placeholder="例：国産、赤" autocomplete="off" aria-label="メモ">
   <div class="acts"><button class="del" id="sDel">削除</button><button class="ok" id="sOk">完了</button></div>
@@ -188,9 +200,13 @@ try{const o=JSON.parse(localStorage.getItem(HKEY)||'{}');if(o&&typeof o==='objec
 // 前の版の {text,done} だけの記録もそのまま読める
 items=items.filter(x=>x&&typeof x.text==='string'&&x.text.trim()).map((x,i)=>({
   id:x.id||uid(),text:x.text.trim(),done:!!x.done,
-  qty:x.qty>0?Math.min(99,Math.floor(x.qty)):1,memo:typeof x.memo==='string'?x.memo:'',
+  qty:x.qty>0?Math.min(99,Math.floor(x.qty)):1,memo:typeof x.memo==='string'?x.memo:'',store:typeof x.store==='string'?x.store.trim():'',
   cat:CAT[x.cat]?x.cat:guess(x.text),ts:x.ts||Date.now()+i,doneTs:x.doneTs||0}));
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items));localStorage.setItem(HKEY,JSON.stringify(hist))}catch(e){}};
+// 今日行く店（12時間だけ覚えておく）。autoName は現在地から選んだ店、manualAt は手で選んだ時刻
+const SKEY='shopping-memo-store-v1';
+let todayStore='',autoName='',manualAt=0,RECS=[];
+try{const o=JSON.parse(localStorage.getItem(SKEY)||'null');if(o&&o.name&&Date.now()-o.ts<12*3600e3)todayStore=o.name}catch(e){}
 
 // ---- 最安くらべ（同じサイトの別アプリ）の記録を読む ----
 const PC_KEY='price-compare-v1',DAY=86400000;
@@ -199,7 +215,8 @@ function pcRecs(){
   try{const a=JSON.parse(localStorage.getItem(PC_KEY)||'[]');return Array.isArray(a)?a.filter(r=>r&&r.item&&r.store&&PC_UNIT[r.unit]&&r.qty>0):[]}catch(e){return []}
 }
 const pcUp=r=>r.price/r.qty*PC_UNIT[r.unit].per;
-function priceHint(text,recs){
+// 品名に合う記録を店ごとの最新にして、安い順に並べる。{list:[{store,up,unit,ts}],best}
+function priceInfo(text,recs){
   const t=text.trim().toLowerCase();if(!t)return null;
   let name=null;
   for(const r of recs){const n=r.item.trim().toLowerCase();if(n.length>=2&&t.includes(n)&&(!name||n.length>name.length))name=n}
@@ -212,10 +229,47 @@ function priceHint(text,recs){
     const k=r.store.trim().toLowerCase(),o=byStore.get(k);
     if(!o||r.ts>o.ts)byStore.set(k,r);
   }
-  const best=[...byStore.values()].sort((a,b)=>pcUp(a)-pcUp(b))[0];
-  const up=Math.round(pcUp(best)*10)/10;
-  const days=Math.floor((Date.now()-best.ts)/DAY);
-  return {text:'最安 '+best.store+' '+up.toLocaleString('ja-JP')+'円/'+PC_UNIT[best.unit].disp,old:days>30?days+'日前':''};
+  const list=[...byStore.values()].map(r=>({store:r.store.trim(),up:pcUp(r),unit:r.unit,ts:r.ts})).sort((a,b)=>a.up-b.up);
+  return {list,best:list[0]};
+}
+const fmt=x=>(Math.round(x.up*10)/10).toLocaleString('ja-JP')+'円/'+PC_UNIT[x.unit].disp;
+function priceHint(text,recs){
+  const i=priceInfo(text,recs);if(!i)return null;
+  const days=Math.floor((Date.now()-i.best.ts)/DAY);
+  return {text:'最安 '+i.best.store+' '+fmt(i.best),old:days>30?days+'日前':''};
+}
+
+// ---- 店 ----
+const norm=s=>String(s||'').normalize('NFKC').trim().toLowerCase();
+const sameStore=(a,b)=>{a=norm(a);b=norm(b);if(!a||!b)return false;return a===b||(Math.min(a.length,b.length)>=3&&(a.includes(b)||b.includes(a)))};
+function knownStores(){
+  const m=[];
+  const add=(name,ts)=>{name=String(name||'').trim();if(!name)return;const o=m.find(x=>sameStore(x.name,name));if(o){if(ts>o.ts)o.ts=ts}else m.push({name,ts})};
+  for(const r of pcRecs())add(r.store,r.ts);
+  for(const it of items)add(it.store,0);
+  if(todayStore)add(todayStore,0);
+  return m.sort((a,b)=>b.ts-a.ts).map(x=>x.name);
+}
+const hue=s=>{let n=0;for(const ch of norm(s))n=(n*31+ch.charCodeAt(0))%360;return n};
+// 品 it を、今日の店 S で買う物か・どこでもいい物か・他の店で買う物かに分ける
+function place(it,info,S){
+  const own=it.store;
+  const mine=info?info.list.find(x=>sameStore(x.store,S)):null,best=info?info.best:null;
+  if(own){
+    if(!sameStore(own,S))return {b:'other'};
+    if(!best)return {b:'here'};
+    if(!mine)return {b:'here',note:best.store+'が最安 '+fmt(best)+'（ここは未確認）',cls:'w'};
+    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安 '+fmt(mine)};
+    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安 '+fmt(mine)};
+    return {b:'here',note:best.store+'の方が安い（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
+  }
+  if(!info)return {b:'any'};
+  if(mine){
+    if(mine.up<=best.up+1e-9)return {b:'here',note:'最安 '+fmt(mine)};
+    if(mine.up<=best.up*1.05)return {b:'here',note:'ほぼ最安 '+fmt(mine)};
+    return {b:'other',note:best.store+'が安い（−'+Math.round((mine.up-best.up)*10)/10+'円/'+PC_UNIT[mine.unit].disp+'）',cls:'w'};
+  }
+  return {b:'any',note:best.store+'が最安 '+fmt(best)+'（ここは未確認）',cls:'w'};
 }
 
 // ---- 通知と取り消し ----
@@ -244,7 +298,7 @@ function addText(raw){
       if(same.done){same.done=false;same.doneTs=0;same.qty=qty;msg='「'+short(text)+'」をリストに戻しました'}
       else{same.qty=Math.min(99,same.qty+qty);msg='「'+short(text)+'」は入っていたので ×'+same.qty+' にしました'}
     }else{
-      items.push({id:uid(),text,done:false,qty,memo:'',cat:guess(text),ts:Date.now(),doneTs:0});
+      items.push({id:uid(),text,done:false,qty,memo:'',store:'',cat:guess(text),ts:Date.now(),doneTs:0});
     }
     hist[text]=(hist[text]||0)+1;
   }
@@ -268,7 +322,7 @@ function clearDone(){
 
 // ---- 表示 ----
 let doneOpen=true,suppressClick=false;
-function row(it,recs){
+function row(it,recs,note){
   const li=h('div','row'+(it.done?' done':''));
   const swbg=h('div','swbg','削除');li.append(swbg);
   const fr=h('div','front');
@@ -277,8 +331,12 @@ function row(it,recs){
   const body=h('div','body');body.append(h('div','name',it.text));
   const meta=h('div','meta');
   if(it.qty>1)meta.append(h('span','q','×'+it.qty));
-  const ph=it.done?null:priceHint(it.text,recs);
-  if(ph){const p=h('span','p',ph.text);if(ph.old)p.append(h('span','old',' ('+ph.old+')'));meta.append(p)}
+  if(it.store&&!(todayStore&&sameStore(it.store,todayStore))){
+    const st=h('span','st',it.store),hu=hue(it.store);
+    st.style.color='hsl('+hu+',55%,38%)';st.style.background='hsla('+hu+',65%,50%,.16)';meta.append(st);
+  }
+  const ph=it.done?null:(note!==undefined?note:priceHint(it.text,recs));
+  if(ph){const p=h('span','p'+(ph.cls?' '+ph.cls:''),ph.text);if(ph.old)p.append(h('span','old',' ('+ph.old+')'));meta.append(p)}
   if(it.memo)meta.append(h('span','m',it.memo));
   body.append(meta);
   const more=h('button','more','⋯');more.type='button';more.setAttribute('aria-label',it.text+'を編集');
@@ -321,25 +379,46 @@ function renderSug(){
     box.append(b);
   }
 }
-function render(){
-  const recs=pcRecs();
-  const pend=items.filter(x=>!x.done),dn=items.filter(x=>x.done).sort((a,b)=>b.doneTs-a.doneTs);
-  const L=$('list');L.textContent='';
-  if(!items.length){
-    const e=h('div','empty');e.append(h('div','big','🛒'),h('div','','買うものはありません'));L.append(e);
-  }
+// list を売り場ごとにまとめて box に足す。note(it) は行に出す一言（undefined なら最安の表示）
+function catGroups(box,list,note){
   for(const c of CATS){
-    const g=pend.filter(x=>x.cat===c.id).sort((a,b)=>a.ts-b.ts);
+    const g=list.filter(x=>x.cat===c.id).sort((a,b)=>a.ts-b.ts);
     if(!g.length)continue;
     const sec=h('div','grp');
     const hd=h('div','gh');const em=h('span','e',c.ico);em.style.setProperty('--c',c.c);
     hd.append(em,h('span','',c.name),h('span','n',String(g.length)));
-    const cl=h('div','cardlist');g.forEach(it=>cl.append(row(it,recs)));
-    sec.append(hd,cl);L.append(sec);
+    const cl=h('div','cardlist');g.forEach(it=>cl.append(row(it,RECS,note(it))));
+    sec.append(hd,cl);box.append(sec);
+  }
+}
+let otherOpen=false;
+function render(){
+  RECS=pcRecs();
+  const recs=RECS,S=todayStore;
+  const pend=items.filter(x=>!x.done),dn=items.filter(x=>x.done).sort((a,b)=>b.doneTs-a.doneTs);
+  const L=$('list');L.textContent='';
+  if(!items.length){
+    const e=h('div','empty');e.append(h('div','big','🛒'),h('div','','買うものはありません'));L.append(e);
+  }else if(!S){
+    catGroups(L,pend,()=>undefined);
+  }else{
+    const P=new Map(),bk={here:[],any:[],other:[]};
+    for(const it of pend){const p=place(it,priceInfo(it.text,recs),S);P.set(it,p);bk[p.b].push(it)}
+    const note=it=>{const p=P.get(it);return p&&p.note?{text:p.note,cls:p.cls}:null};
+    const head=(t,n)=>{const d=h('div','bh');d.append(h('span','',t),h('span','n',n+' 点'));return d};
+    if(bk.here.length){L.append(head('🛍 '+S+'で買う',bk.here.length));catGroups(L,bk.here,note)}
+    if(bk.any.length){L.append(head('👀 どこでもいい',bk.any.length));catGroups(L,bk.any,note)}
+    if(!bk.here.length&&!bk.any.length&&pend.length)L.append(h('div','none',S+'で買う物はありません'));
+    if(bk.other.length){
+      const b=h('button','bh fold'+(otherOpen?'':' closed'));b.type='button';
+      b.append(h('span','ar','▾'),h('span','','他の店で買う'),h('span','n',bk.other.length+' 点'));
+      b.onclick=()=>{otherOpen=!otherOpen;render()};L.append(b);
+      if(otherOpen)catGroups(L,bk.other,note);
+    }
   }
   $('doneSec').hidden=!dn.length;
   const D=$('done');D.textContent='';
-  if(dn.length&&doneOpen)dn.forEach(it=>D.append(row(it,recs)));
+  if(dn.length&&doneOpen)dn.forEach(it=>D.append(row(it,recs,null)));
   D.hidden=!doneOpen;
   $('dh').classList.toggle('closed',!doneOpen);
   $('dcnt').textContent='カゴに入れた '+dn.length;
@@ -348,7 +427,62 @@ function render(){
   $('ptxt').textContent=!total?'空っぽです':!pend.length?'ぜんぶ買えた 🎉':'あと '+pend.length+' 点';
   $('pnum').textContent=total?dn.length+' / '+total:'';
   $('date').textContent=new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+  renderStores();
   renderSug();
+}
+
+// ---- 今日の店 ----
+function renderStores(){
+  const box=$('tstore');box.textContent='';
+  const list=knownStores();
+  if(!list.length)return;
+  box.append(h('span','lb','今日の店'));
+  const mk=(label,name)=>{
+    const on=name?norm(todayStore)===norm(name):!todayStore;
+    const b=h('button','chip'+(on?' on':''),label);b.type='button';
+    b.onclick=()=>setStore(on&&name?'':name);box.append(b);
+  };
+  mk('すべて','');
+  list.forEach(n=>mk((autoName&&sameStore(n,autoName)?'📍 ':'')+n,n));
+}
+function setStore(name,auto){
+  todayStore=name;autoName=auto?name:'';if(!auto)manualAt=Date.now();
+  try{if(name)localStorage.setItem(SKEY,JSON.stringify({name,ts:Date.now()}));else localStorage.removeItem(SKEY)}catch(e){}
+  render();
+}
+// 近くの店を自動で選ぶ（位置は端末の中だけ。店の座標は最安くらべが記録したもの）
+let lastLoc=0;
+const rad=x=>x*Math.PI/180;
+function dist(a,b){
+  const s=Math.sin(rad(b.lat-a.lat)/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(rad(b.lng-a.lng)/2)**2;
+  return 12742000*Math.asin(Math.sqrt(s));
+}
+function storeLocs(){
+  const m=new Map();
+  for(const r of pcRecs()){
+    if(typeof r.lat!=='number'||typeof r.lng!=='number')continue;
+    const k=r.store.trim(),o=m.get(k);
+    if(!o||r.ts>o.ts)m.set(k,{store:k,lat:r.lat,lng:r.lng,ts:r.ts});
+  }
+  return [...m.values()];
+}
+async function autoLocate(force){
+  if(!navigator.geolocation)return;
+  if(Date.now()-manualAt<30*60000)return;          // 手で選んだ直後は、位置で上書きしない
+  if(!force&&Date.now()-lastLoc<60000)return;
+  const locs=storeLocs();
+  if(!locs.length)return;                          // 座標のある店が無ければ、位置の許可も求めない
+  lastLoc=Date.now();
+  const p=await new Promise(ok=>navigator.geolocation.getCurrentPosition(
+    q=>ok({lat:q.coords.latitude,lng:q.coords.longitude,acc:q.coords.accuracy}),()=>ok(null),
+    {enableHighAccuracy:false,timeout:8000,maximumAge:60000}));
+  if(!p||p.acc>300)return;
+  let best=null;
+  for(const s of locs){const d=dist(p,s);if(d<=150&&(!best||d<best.d))best={store:s.store,d}}
+  if(!best)return;
+  const changed=!sameStore(todayStore,best.store);
+  setStore(best.store,true);
+  if(changed)toast('📍 '+best.store+' にいます');
 }
 
 // ---- 編集シート ----
@@ -362,8 +496,22 @@ function openSheet(it){
     b.onclick=()=>{it.cat=c.id;save();[...box.children].forEach((x,i)=>x.classList.toggle('on',CATS[i].id===c.id))};
     box.append(b);
   }
+  $('sStore').value='';renderStoreChips();
   $('ov').classList.add('open');$('sheet').classList.add('open');
 }
+function renderStoreChips(){
+  const box=$('stores');box.textContent='';
+  const info=priceInfo(cur.text,RECS),best=info?info.best.store:'';
+  const mk=(label,val)=>{
+    const on=val?norm(cur.store)===norm(val):!cur.store;
+    const b=h('button','chip'+(on?' on':''),label);b.type='button';
+    b.onclick=()=>{cur.store=on?'':val;$('sStore').value='';save();renderStoreChips()};box.append(b);
+  };
+  mk('おまかせ','');
+  if(best)mk('✨ '+best+'（最安）',best);
+  knownStores().filter(n=>!best||!sameStore(n,best)).forEach(n=>mk(n,n));
+}
+$('sStore').oninput=()=>{if(cur){cur.store=$('sStore').value.trim();save()}};
 function closeSheet(){
   $('ov').classList.remove('open');$('sheet').classList.remove('open');
   if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
@@ -388,7 +536,7 @@ $('share').onclick=async()=>{
   let s='🛒 買い物リスト\n';
   for(const c of CATS){
     const g=pend.filter(x=>x.cat===c.id);if(!g.length)continue;
-    s+='\n【'+c.name+'】\n'+g.map(x=>'・'+x.text+(x.qty>1?' ×'+x.qty:'')+(x.memo?'（'+x.memo+'）':'')).join('\n')+'\n';
+    s+='\n【'+c.name+'】\n'+g.map(x=>'・'+x.text+(x.qty>1?' ×'+x.qty:'')+(x.store?' @'+x.store:'')+(x.memo?'（'+x.memo+'）':'')).join('\n')+'\n';
   }
   try{
     if(navigator.share){await navigator.share({text:s})}
@@ -396,10 +544,10 @@ $('share').onclick=async()=>{
   }catch(e){if(e&&e.name!=='AbortError')toast('共有できませんでした')}
 };
 // 最安くらべで記録して戻ってきたときに読み直す
-addEventListener('pageshow',()=>render());
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+addEventListener('pageshow',()=>{render();autoLocate()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();autoLocate()}});
 addEventListener('storage',e=>{if(e.key===PC_KEY)render()});
-save();render();
+save();render();autoLocate(true);
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
 </script>
 </body>
