@@ -3,7 +3,7 @@
   "short_name": "買い物メモ",
   "lang": "ja",
   "start_url": "./index.html",
-  "scope": "./",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f6f7f5",
   "theme_color": "#2f855a",
