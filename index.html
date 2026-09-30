@@ -346,6 +346,7 @@ function knownStores(){
   const add=(name,ts)=>{name=String(name||'').trim();if(!name)return;const o=m.find(x=>sameStore(x.name,name));if(o){if(ts>o.ts)o.ts=ts}else m.push({name,ts})};
   for(const r of pcRecs())add(r.store,r.ts);
   for(const it of items)add(it.store,0);
+  for(const s of reg)add(s.store,0);      // 定番に付けた店も、今日の店のボタンに出す
   if(todayStore)add(todayStore,0);
   return m.sort((a,b)=>b.ts-a.ts).map(x=>x.name);
 }
