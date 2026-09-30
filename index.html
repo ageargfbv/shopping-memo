@@ -126,7 +126,7 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
 .warn{display:block;width:100%;margin-top:12px;text-align:left;background:#fff4dc;color:#8a5a00;border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600}
 @media (prefers-color-scheme:dark){.warn{background:#3a2f12;color:#f3c76a}}
 .seg{display:flex;gap:8px;margin-bottom:10px}
-.seg button{flex:1;padding:11px;border-radius:12px;background:var(--card2);font-weight:700;font-size:15px;color:var(--sub)}
+.seg button{flex:1;padding:10px 4px;border-radius:12px;background:var(--card2);font-weight:700;font-size:13.5px;color:var(--sub);white-space:nowrap}
 .seg button.on{background:var(--acc);color:#fff}
 .srow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
 .sname{flex:1;min-width:0}
@@ -139,6 +139,16 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
 .sform{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .sform .fld{flex:1;min-width:140px}
 .stk{color:#b7791f;font-weight:600}
+.srow .chk{border-color:#b9cfa0}
+.srow .chk.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.srow.have{opacity:.5}
+.srow .sub.g{color:var(--acc);font-weight:700}
+.wide{display:block;width:100%;margin-top:16px;padding:14px;border-radius:16px;background:var(--acc);color:#fff;font:400 16px "Dela Gothic One","M PLUS 1p",sans-serif;text-align:center;box-shadow:0 4px 0 var(--gd)}
+.wide:disabled{opacity:.45;box-shadow:none}
+.dchip{display:inline-flex;align-items:center;gap:2px;flex:none;background:var(--card);border:2px solid var(--acc2);border-radius:99px;padding:0 4px 0 13px;font-size:14px;white-space:nowrap}
+.dchip button{padding:7px 0}
+.dchip .x{color:var(--sub);padding:7px 9px;font-size:13px}
+.dchip small{color:var(--sub);font-size:11.5px;margin-left:4px}
 #ask{position:fixed;left:50%;bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 14px);transform:translate(-50%,20px);background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:10px 12px;display:flex;gap:8px;align-items:center;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;width:calc(100% - 24px);max-width:536px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 #ask.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #ask span{flex:1;min-width:0;line-height:1.3}
@@ -198,6 +208,7 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
   </form>
   <div class="pick" id="addStRow" hidden></div>
   <div class="sug" id="tstore"></div>
+  <div class="sug" id="due"></div>
   <div class="sug" id="sug"></div>
   <div id="list"></div>
   <section id="doneSec" hidden>
@@ -221,13 +232,15 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
   <div class="lbl">買う店</div>
   <div class="cats" id="stores"></div>
   <input class="fld" id="sStore" placeholder="店を追加（例：サンディ）" autocomplete="off" aria-label="店を追加" style="margin-top:8px">
+  <div class="lbl">定番</div>
+  <div class="cats"><button class="chip" id="sReg" type="button"></button></div>
   <div class="lbl">メモ</div>
   <input class="fld" id="sMemo" placeholder="例：国産、赤" autocomplete="off" aria-label="メモ">
   <div class="acts"><button class="del" id="sDel">削除</button><button class="ok" id="sOk">完了</button></div>
 </div>
 <div id="sheet2" role="dialog" aria-modal="true" aria-label="セットとうちにある物">
   <div class="grab"></div>
-  <div class="seg"><button id="m1">📋 セット</button><button id="m2">🧊 うちにある物</button></div>
+  <div class="seg"><button id="m1">📋 セット</button><button id="m3">🔁 定番</button><button id="m2">🧊 うちにある物</button></div>
   <div id="p2"></div>
   <div class="acts"><button class="ok" id="s2Ok">閉じる</button></div>
 </div>
@@ -277,7 +290,13 @@ const SETKEY='shopping-memo-sets-v1',STKEY='shopping-memo-stock-v1';
 let sets=[],stock=[];
 try{const a=JSON.parse(localStorage.getItem(SETKEY)||'[]');if(Array.isArray(a))sets=a.filter(s=>s&&s.name&&Array.isArray(s.items))}catch(e){}
 try{const a=JSON.parse(localStorage.getItem(STKEY)||'[]');if(Array.isArray(a))stock=a.filter(s=>s&&s.text)}catch(e){}
-const saveX=()=>{try{localStorage.setItem(SETKEY,JSON.stringify(sets));localStorage.setItem(STKEY,JSON.stringify(stock))}catch(e){}};
+// 定番（毎回「いる／いらない」を選ぶ物）と、買った日の記録（間隔を自動で覚える）
+const REGKEY='shopping-memo-reg-v1',LOGKEY='shopping-memo-log-v1';
+let reg=[],buyLog={},regSel=new Set();
+try{const a=JSON.parse(localStorage.getItem(REGKEY)||'[]');if(Array.isArray(a))reg=a.filter(s=>s&&s.text)}catch(e){}
+try{const o=JSON.parse(localStorage.getItem(LOGKEY)||'{}');if(o&&typeof o==='object'&&!Array.isArray(o))buyLog=o}catch(e){}
+const saveX=()=>{try{localStorage.setItem(SETKEY,JSON.stringify(sets));localStorage.setItem(STKEY,JSON.stringify(stock));localStorage.setItem(REGKEY,JSON.stringify(reg))}catch(e){}};
+const saveLog=()=>{try{localStorage.setItem(LOGKEY,JSON.stringify(buyLog))}catch(e){}};
 
 // ---- 最安くらべ（同じサイトの別アプリ）の記録を読む ----
 const PC_KEY='price-compare-v1',DAY=86400000;
@@ -395,6 +414,7 @@ function addSet(s){
 }
 function toggle(it,li){
   it.done=!it.done;it.doneTs=it.done?Date.now():0;save();
+  if(it.done)logBuy(it.text);else unlogBuy(it.text);
   li.classList.add('pop');setTimeout(render,it.done?240:120);
   if(it.done)askPrice(it);else hideAsk();
 }
@@ -470,6 +490,47 @@ function renderSug(){
     box.append(b);
   }
 }
+// ---- 買う間隔を覚えて「そろそろ」を出す ----
+// 同じ日に2回チェックしても1回と数える。3回以上買った物だけ、間隔（中央値）を出す
+function logBuy(name){
+  const k=norm(name),o=buyLog[k]||(buyLog[k]={n:name,t:[],s:0}),last=o.t[o.t.length-1];
+  o.n=name;
+  if(!last||Date.now()-last>12*3600e3){o.t.push(Date.now());if(o.t.length>12)o.t.shift()}
+  saveLog();
+}
+// チェックを外したとき（押し間違い）は、直前の記録を取り消す
+function unlogBuy(name){
+  const o=buyLog[norm(name)];
+  if(o&&o.t.length&&Date.now()-o.t[o.t.length-1]<10*60000){o.t.pop();saveLog()}
+}
+function dueList(){
+  const now=Date.now(),inList=new Set(items.filter(x=>!x.done).map(x=>norm(x.text))),out=[];
+  for(const k in buyLog){
+    const o=buyLog[k];
+    if(!o||!Array.isArray(o.t)||o.t.length<3||inList.has(k))continue;
+    const gaps=[];for(let i=1;i<o.t.length;i++)gaps.push((o.t[i]-o.t[i-1])/DAY);
+    gaps.sort((a,b)=>a-b);
+    const med=gaps[Math.floor(gaps.length/2)];
+    if(med<2)continue;                               // ほぼ毎日買う物は対象にしない
+    const since=(now-o.t[o.t.length-1])/DAY;
+    if(since>=med*0.85&&now>(o.s||0))out.push({k,name:o.n,med:Math.round(med),since:Math.floor(since),over:since/med});
+  }
+  return out.sort((a,b)=>b.over-a.over).slice(0,6);
+}
+function renderDue(){
+  const box=$('due');box.textContent='';
+  const list=dueList();
+  if(!list.length)return;
+  box.append(h('span','lb','そろそろ'));
+  for(const d of list){
+    const c=h('span','dchip'),b=h('button','','＋ '+d.name);b.type='button';
+    b.append(h('small','','約'+d.med+'日ごと・'+d.since+'日前'));
+    b.onclick=()=>addText(d.name);
+    const x=h('button','x','✕');x.type='button';x.setAttribute('aria-label',d.name+'は今回いらない');
+    x.onclick=()=>{buyLog[d.k].s=Date.now()+d.med*DAY;saveLog();render();toast('「'+short(d.name)+'」は、次の間隔まで出さないのだ')};
+    c.append(b,x);box.append(c);
+  }
+}
 // list を売り場ごとにまとめて box に足す。note(it) は行に出す一言（undefined なら最安の表示）
 function catGroups(box,list,note){
   for(const c of CATS){
@@ -518,6 +579,7 @@ function render(){
   renderStores();
   renderSug();
   renderBub();
+  renderDue();
   updateAddBtn();
 }
 
@@ -586,7 +648,7 @@ function openSheet(it){
     b.onclick=()=>{it.cat=c.id;save();[...box.children].forEach((x,i)=>x.classList.toggle('on',CATS[i].id===c.id))};
     box.append(b);
   }
-  $('sStore').value='';renderStoreChips();
+  $('sStore').value='';renderStoreChips();updateRegBtn();
   $('ov').classList.add('open');$('sheet').classList.add('open');
 }
 function renderStoreChips(){
@@ -601,6 +663,14 @@ function renderStoreChips(){
   if(best)mk('✨ '+best+'（最安）',best);
   knownStores().filter(n=>!best||!sameStore(n,best)).forEach(n=>mk(n,n));
 }
+function regHas(text){return reg.find(s=>norm(s.text)===norm(text))}
+function updateRegBtn(){const b=$('sReg'),has=cur&&regHas(cur.text);b.textContent=has?'🔁 定番に入っている（タップで外す）':'🔁 定番に入れる';b.classList.toggle('on',!!has)}
+$('sReg').onclick=()=>{
+  if(!cur)return;
+  const has=regHas(cur.text);
+  if(has)reg=reg.filter(s=>s!==has);else reg.push({id:uid(),text:cur.text,qty:cur.qty,cat:cur.cat});
+  saveX();updateRegBtn();
+};
 $('sStore').oninput=()=>{if(cur){cur.store=$('sStore').value.trim();save()}};
 function closeSheet(){
   $('ov').classList.remove('open');$('sheet').classList.remove('open');$('sheet2').classList.remove('open');
@@ -706,11 +776,11 @@ function renderBub(){
 $('bub').onclick=()=>{if(bubNear)openPanel('stock')};
 let mode='sets';
 function openPanel(m){
-  mode=m;hideToast();hideAsk();renderPanel();
+  mode=m;hideToast();hideAsk();if(m==='reg')selectAllReg();renderPanel();
   $('ov').classList.add('open');$('sheet2').classList.add('open');
 }
 function renderPanel(){
-  $('m1').classList.toggle('on',mode==='sets');$('m2').classList.toggle('on',mode==='stock');
+  $('m1').classList.toggle('on',mode==='sets');$('m2').classList.toggle('on',mode==='stock');$('m3').classList.toggle('on',mode==='reg');
   const box=$('p2');box.textContent='';
   if(mode==='sets'){
     if(!sets.length)box.append(h('div','none','セットはまだありません'));
@@ -731,6 +801,32 @@ function renderPanel(){
       sets.push({id:uid(),name,items:items.map(x=>({text:x.text,qty:x.qty}))});saveX();renderPanel();toast('セット「'+short(name)+'」を保存しました');
     };
     f.append(inp,sv);box.append(f);
+  }else if(mode==='reg'){
+    const inList=new Set(items.filter(x=>!x.done).map(x=>norm(x.text)));
+    if(!reg.length)box.append(h('div','none','定番はまだないのだ'));
+    reg.forEach(s=>{
+      const have=inList.has(norm(s.text)),on=regSel.has(s.id)&&!have;
+      const r=h('div','srow'+(have?' have':'')),ck=h('button','chk'+(on?' on':''),'✓');ck.type='button';
+      ck.setAttribute('role','checkbox');ck.setAttribute('aria-checked',String(on));ck.setAttribute('aria-label',s.text);ck.disabled=have;
+      ck.onclick=()=>{if(regSel.has(s.id))regSel.delete(s.id);else regSel.add(s.id);renderPanel()};
+      const nm=h('div','sname');nm.append(h('b','',s.text+(s.qty>1?' ×'+s.qty:'')),have?h('span','sub g','もうリストに入っているのだ'):h('span','sub',CAT[s.cat]?CAT[s.cat].name:''));
+      const del=h('button','sdel','✕');del.type='button';del.setAttribute('aria-label',s.text+'を定番から外す');
+      del.onclick=()=>{const before=JSON.parse(JSON.stringify(reg));reg=reg.filter(x=>x!==s);saveX();renderPanel();toast('「'+short(s.text)+'」を定番から外したのだ','元に戻す',()=>{reg=before;saveX();if($('sheet2').classList.contains('open'))renderPanel()})};
+      r.append(ck,nm,del);box.append(r);
+    });
+    const n=reg.filter(s=>regSel.has(s.id)&&!inList.has(norm(s.text))).length;
+    const go=h('button','wide','選んだ '+n+' 点をリストに足すのだ');go.type='button';go.disabled=!n;
+    go.onclick=()=>{
+      let c=0;
+      for(const s of reg){if(regSel.has(s.id)&&!inList.has(norm(s.text))){putItem(s.text,s.qty||1,effStore(),s.cat);c++}}
+      save();closeSheet();toast('定番から '+c+' 点を足したのだ');
+    };
+    box.append(go);
+    const f=h('div','sform'),inp=h('input','fld');inp.placeholder='定番に入れる物（例：トイレットペーパー）';inp.setAttribute('aria-label','定番に入れる物');
+    const ad=h('button','sadd','追加');ad.type='button';
+    const add=()=>{const v=inp.value.trim();if(!v)return;const id=uid();reg.push({id,text:v,qty:1,cat:guess(v)});regSel.add(id);saveX();renderPanel()};
+    ad.onclick=add;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+    f.append(inp,ad);box.append(f);
   }else{
     const list=[...stock].sort((a,b)=>(a.exp||'9999-99-99')<(b.exp||'9999-99-99')?-1:1);
     if(!list.length)box.append(h('div','none','登録した物はありません'));
@@ -757,6 +853,9 @@ $('bSets').onclick=()=>openPanel('sets');
 $('bStock').onclick=()=>openPanel('stock');
 $('m1').onclick=()=>{mode='sets';renderPanel()};
 $('m2').onclick=()=>{mode='stock';renderPanel()};
+$('m3').onclick=()=>{mode='reg';selectAllReg();renderPanel()};
+// 定番は、はじめは全部「いる」にしておく。リストに入っていない物だけ
+function selectAllReg(){regSel=new Set(reg.map(s=>s.id))}
 $('s2Ok').onclick=closeSheet;
 
 // ---- 入力・共有・そのほか ----
