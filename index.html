@@ -17,6 +17,7 @@
 :root{--bg:#f2f9e6;--card:#fff;--card2:#eef6df;--fg:#1d2b12;--sub:#6a7a58;--acc:#4aa52e;--acc2:#8bd44a;--gd:#2f7d1e;--soft:#e2f5bd;--line:#dfeccb;--danger:#e5484d;--shadow:0 5px 0 var(--line),0 8px 18px rgba(50,90,20,.14);--tab:66px}
 @media (prefers-color-scheme:dark){:root{--bg:#11190d;--card:#1b2615;--card2:#243020;--fg:#eef5e6;--sub:#a3b394;--acc:#6cc24a;--acc2:#4aa52e;--gd:#9be36f;--soft:#26401b;--line:#2c3a24;--shadow:0 5px 0 #0a1007,0 8px 18px rgba(0,0,0,.4)}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{touch-action:manipulation}   /* ダブルタップで拡大しない（スクロールと、ふつうのタップは今までどおり） */
 html{background:var(--bg)}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 24px);-webkit-text-size-adjust:100%}
 button{font:inherit;border:0;background:none;color:inherit;padding:0;cursor:pointer}
