@@ -56,7 +56,7 @@ main{max-width:560px;margin:0 auto;padding:12px 16px 0}
 .pick{background:var(--card);border-radius:16px;padding:8px 14px 10px;margin-top:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .pkrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 0}
 .pkrow .lb{width:100%;font-size:12px;color:var(--sub);font-weight:700}
-.pkrow input{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:7px 13px;font-size:14px;outline:0}
+.pkrow input{flex:1;min-width:130px;border:1px solid var(--line);background:var(--card2);border-radius:99px;padding:7px 13px;font-size:16px;outline:0}
 .add .stbtn{width:auto;max-width:132px;height:36px;padding:0 12px;border-radius:99px;background:var(--card2);color:var(--fg);font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .add .stbtn.on{background:var(--soft);color:var(--acc)}
 .add button{width:44px;height:44px;border-radius:14px;background:var(--acc);color:#fff;font-size:26px;line-height:1;display:grid;place-items:center;transition:transform .12s}
@@ -737,6 +737,10 @@ function renderPick(){
   r2.append(inp);
 }
 $('addSt').onclick=()=>{const b=$('addStRow');b.hidden=!b.hidden;if(!b.hidden)renderPick()};
+// 買うものの欄をタップしたら、店・売り場の選択を自動で開く（閉じるのは🏪ボタンか追加したとき）
+const openPick=()=>{const b=$('addStRow');if(b.hidden){b.hidden=false;renderPick()}};
+$('t').addEventListener('focus',openPick);
+$('t').addEventListener('click',openPick);
 
 // ---- 買った値段を、最安くらべの記録に足す ----
 function lastRec(text){
